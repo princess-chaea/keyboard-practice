@@ -379,8 +379,11 @@ export default function App() {
       // 부적절한 키 입력 차단 (타이핑형이 아닌 경우)
       if (stage.type === 'edit' || stage.type === 'nav') {
           // 글자/숫자 키 입력을 막고 오직 백스페이스, 딜리트, 방향키(제약 없을때), 엔터만 허용
-          const isActionKey = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter', 'Tab'].includes(e.key);
-          if (!isActionKey && e.key.length === 1 && !e.ctrlKey) {
+          // 하지만 Stage 6, 10은 직접 입력을 병행해야 하므로 예외 처리
+          const isActionKey = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter', 'Tab', 'Shift', 'Alt'].includes(e.key);
+          const canTypeInThisStage = [6, 10].includes(stage.id);
+          
+          if (!isActionKey && e.key.length === 1 && !e.ctrlKey && !canTypeInThisStage) {
               e.preventDefault();
               setGameState(prev => ({ ...prev, showError: true, message: "지금은 입력보다 키 기능을 익힐 때예요!" }));
               return;
