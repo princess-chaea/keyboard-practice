@@ -352,7 +352,12 @@ export default function App() {
             const start = e.target.selectionStart;
             const end = e.target.selectionEnd;
             const newVal = gameState.input.substring(0, start) + "\t" + gameState.input.substring(end);
-            setGameState(prev => ({ ...prev, input: newVal }));
+            
+            // Refactored Match Check
+            if (!checkCompletion(newVal, stage)) {
+                setGameState(prev => ({ ...prev, input: newVal }));
+            }
+            
             // 다음 렌더링 후 커서 유지
             setTimeout(() => {
                 if (inputRef.current) inputRef.current.setSelectionRange(start + 1, start + 1);
@@ -427,25 +432,7 @@ export default function App() {
     return () => { window.removeEventListener('keydown', handleKeyDown); window.removeEventListener('keyup', handleKeyUp); };
   }, [view, currentStage, gameState.viewMode, gameState.clipboard]);
 
-  const handleInputChange = (e) => {
-    const val = e.target.value;
-    const stage = STAGES[currentStage];
-    setGameState(prev => ({ ...prev, showError: false }));
-
-    // 문장 보호 (Anti-Vandalism)
-    // 'edit' 타입 미션에서 정답 문장에 포함된 글자들을 과하게 지우는 것 방지
-    if (stage.type === 'edit') {
-        const targetParts = stage.targetText.split('');
-        let testVal = val.replace(/\r/g, "");
-        // 정답 텍스트에 있는 글자 중 하나라도 파괴되었는지 확인 (단순 비교)
-        // 아주 엄격하게 하기보다, 전체 길이가 너무 짧아지면 경고
-        if (testVal.length < stage.targetText.length - 2) {
-             setGameState(prev => ({ ...prev, showError: true, message: "너무 많이 지웠어요! 다시 해볼까요?" }));
-             setGameState(prev => ({ ...prev, input: stage.text })); // 강제 복구
-             return;
-        }
-    }
-
+  const checkCompletion = (val, stage) => {
     let isMatch = false;
     if (stage.type === 'typing') {
       const currentTarget = stage.targets[gameState.targetIdx];
@@ -470,7 +457,27 @@ export default function App() {
           setGameState(prev => ({ ...prev, completed: true, showSuccessEffect: false }));
         }, 1500);
       }
-    } else {
+      return true;
+    }
+    return false;
+  };
+
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    const stage = STAGES[currentStage];
+    setGameState(prev => ({ ...prev, showError: false }));
+
+    // 문장 보호 (Anti-Vandalism)
+    if (stage.type === 'edit') {
+        let testVal = val.replace(/\r/g, "");
+        if (testVal.length < stage.targetText.length - 2) {
+             setGameState(prev => ({ ...prev, showError: true, message: "너무 많이 지웠어요! 다시 해볼까요?" }));
+             setGameState(prev => ({ ...prev, input: stage.text })); // 강제 복구
+             return;
+        }
+    }
+
+    if (!checkCompletion(val, stage)) {
       setGameState(prev => ({ ...prev, input: val }));
     }
   };
