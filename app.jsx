@@ -25,8 +25,17 @@ import {
 
 // --- 이미지 자산 ---
 const SHIN_IMG = "https://i.ibb.co/Q3yff3rD/image.png";
-const ACTION_MASK_IMG = "https://i.ibb.co/XrK5k4sV/1.png";
+const ACTION_MASK_IMG = "https://i.ibb.co/DHWzNQ5Q/image.png";
 const VILLAIN_IMG = "https://i.ibb.co/kgLsW9KH/image.png"; // 원장 선생님(두목님)
+const DAD_IMG = "https://i.ibb.co/mCYbd379/image.png";
+const MOM_IMG = "https://i.ibb.co/mrhjXcdz/image.png";
+
+const BG_KITCHEN = "https://i.ibb.co/CxD7QVF/image.png";
+const BG_SCHOOL = "https://i.ibb.co/d0qVdCzg/image.png";
+const BG_BUS = "https://i.ibb.co/RpHmP6ks/image.png";
+
+const KEYBOARD_LAYOUT_IMG = "https://i.ibb.co/nMPHDWm5/1.jpg"; // 키보드 자판 이미지
+const KEY_EXPLANATION_IMG = "https://i.ibb.co/C3VXQ3cY/image.jpg"; // 키보드 버튼 설명 이미지
 
 // --- 데이터 정의 ---
 const KEYBOARD_THEORY = [
@@ -61,71 +70,184 @@ const STAGES = [
   {
     id: 1,
     level: '기초',
-    title: "두목님의 젤리 가로채기",
-    charSay: "짱구야! 두목님이 젤리를 다 가져가기 전에 쌍자음을 입력해!",
-    villainSay: "흐흐흐... 쌍자음을 쓸 줄 모르면 젤리는 내 것이다!",
-    instruction: "Shift를 누른 채 자음을 써서 단어를 완성해!",
-    type: 'typing',
-    targets: ['토끼', '뿌리', '아빠', '코끼리', '쓱싹쓱싹'],
-    failMsg: "정확히 입력해야 해! Shift 키를 잊지 마!"
+    title: "엄마의 심부름 (Backspace)",
+    bg: BG_KITCHEN,
+    dialogue: [
+      { speaker: 'MOM', text: "짱구야, 엄마가 적어둔 장보기 목록에서 '사탕'을 좀 지워줄래?" },
+      { speaker: 'SHIN', text: "에에~ 사탕은 몸에 좋은데... 알겠어요!" },
+      { speaker: 'MOM', text: "커서 바로 앞에 있는 글자를 지울 땐 'Backspace'를 쓰는 거야!" }
+    ],
+    instruction: "Backspace 키를 눌러 '사탕'을 지워보자!",
+    type: 'edit',
+    text: '사과 배 사탕 고기',
+    targetText: '사과 배  고기',
+    requiredKey: 'Backspace',
+    hint: "글자 뒤에 커서를 두고 Backspace를 눌러!",
+    failMsg: "Backspace 키를 정확히 사용해야 해!"
   },
   {
     id: 2,
     level: '기초',
-    title: "오타 폭탄 해체",
-    charSay: "액션가면! 폭탄 글자 사이에 '꽝'이 섞여있어! 지워줘!",
-    villainSay: "어디 한번 'Delete' 키로 '꽝'만 쏙 지워보시지!",
-    instruction: "커서를 잘 옮겨서 '꽝' 글자만 Delete로 지워봐!",
+    title: "아빠의 서류 정리 (Delete)",
+    bg: BG_KITCHEN,
+    dialogue: [
+      { speaker: 'DAD', text: "짱구야, 아빠 서류에 '꽝'이라는 글자가 들어갔네. 이것 좀 지워줘." },
+      { speaker: 'SHIN', text: "아빠, 이건 'Delete' 키로 지우는 게 더 빠를걸요?" },
+      { speaker: 'DAD', text: "오, 우리 짱구 똑똑한데? 커서 뒤에 있는 글자를 지울 땐 'Delete'지!" }
+    ],
+    instruction: "Delete 키를 눌러 '꽝'을 지워보자!",
     type: 'edit',
-    text: '액션가면은 꽝최고!',
-    targetText: '액션가면은 최고!',
-    hint: "커서를 '은'과 '꽝' 사이에 두고 Delete를 눌러!",
-    failMsg: "틀렸어! '꽝' 뒤에서 Backspace를 쓰거나 앞에서 Delete를 써야지!"
+    text: '이 서류는 꽝입니다',
+    targetText: '이 서류는 입니다',
+    requiredKey: 'Delete',
+    hint: "커서를 '는'과 '꽝' 사이에 두고 Delete를 눌러!",
+    failMsg: "Delete 키를 사용해야 해! (Backspace는 안돼요)"
   },
   {
     id: 3,
-    level: '심화',
-    title: "두목님의 비밀 문서 복제",
-    charSay: "두목님의 비밀 작전을 복사해서 액션본부에 알려야 해!",
-    villainSay: "내 작전은 너무 길어서 복사 못 할걸? 하하하!",
-    instruction: "문장을 선택하고 Ctrl+C 한 뒤, 입력창에 Ctrl+V 해!",
-    type: 'shortcut',
-    text: '비밀작전: 유치원 간식은 내가 다 먹는다!',
-    targetAction: 'paste',
-    hint: "Ctrl+A로 선택 -> Ctrl+C 복사 -> Ctrl+V 붙여넣기",
-    failMsg: "단축키는 Ctrl 키를 먼저 누른 상태에서 다른 키를 눌러야 해!"
+    level: '기초',
+    title: "유치원 버스 알림 (Enter)",
+    bg: BG_BUS,
+    dialogue: [
+      { speaker: 'SHIN', text: "친구들에게 인사를 하고 싶어요!" },
+      { speaker: 'ACTION', text: "좋아 짱구야! 줄을 바꿔서 멋지게 인사해 보자!" },
+      { speaker: 'ACTION', text: "다음 줄로 넘어갈 땐 'Enter' 에너지를 발산하는 거다!" }
+    ],
+    instruction: "Enter 키를 눌러 줄을 바꾸고 완성해!",
+    type: 'edit',
+    text: '안녕 친구들아나 짱구야',
+    targetText: '안녕 친구들아\n나 짱구야',
+    requiredKey: 'Enter',
+    hint: "줄을 바꾸고 싶은 위치에서 Enter를 쾅!",
+    failMsg: "Enter 키로 줄을 바꿔야 해!"
   },
   {
     id: 4,
     level: '심화',
-    title: "순간이동 탈출 미션",
-    charSay: "두목님이 쫓아와! 커서를 문장 맨 앞으로 순간이동시켜!",
-    villainSay: "어딜 도망가! 마우스 없이 맨 앞으로 갈 수 있을까?",
-    instruction: "Home 키를 눌러 맨 앞으로 가서 '탈출!'을 적어줘!",
-    type: 'nav',
-    text: '짱구 성공',
-    targetText: '탈출!짱구 성공',
-    hint: "Home 키로 커서를 맨 앞으로 보내고 '탈출!'을 써봐.",
-    failMsg: "Home 키를 누르면 한 번에 맨 앞으로 갈 수 있어. 다시 해봐!"
+    title: "쌍자음 파워 전수 (Shift)",
+    bg: BG_SCHOOL,
+    dialogue: [
+      { speaker: 'VILLAIN', text: "흐흐흐... '토끼'를 '도끼'라고 쓸 텐가? 쌍자음은 못 쓰겠지!" },
+      { speaker: 'ACTION', text: "짱구야! 'Shift' 키와 함께라면 어떤 쌍자음도 무섭지 않아!" },
+      { speaker: 'SHIN', text: "으아아! Shift 파워 전개!!" }
+    ],
+    instruction: "Shift를 누른 채 자음을 써서 단어를 완성해!",
+    type: 'typing',
+    targets: ['토끼', '아빠', '뿌리', '씁쓸', '똑똑'],
+    failMsg: "Shift 키를 꾹 누른 상태에서 자음을 눌러야 해!"
   },
   {
     id: 5,
-    level: '마스터',
-    title: "최종 결전: 키보드 마스터",
-    charSay: "이제 마지막이야! 모든 기술을 써서 두목님을 설득하자!",
-    villainSay: "이 긴 문장을 오타 없이 고칠 수 있다면 항복하마!",
-    instruction: "오타 지우기, 줄 바꾸기, 쌍자음까지 모두 사용해!",
+    level: '심화',
+    title: "커서 닌자술 (Arrow Keys)",
+    bg: BG_SCHOOL,
+    dialogue: [
+      { speaker: 'SHIN', text: "커서가 너무 느려요! 빨리 '버섯'만 골라내고 싶어!" },
+      { speaker: 'ACTION', text: "방향키(Arrow Keys)를 사용하면 커서를 자유자재로 움직일 수 있지!" },
+      { speaker: 'ACTION', text: "단어 사이를 슉슉 이동해 봐!" }
+    ],
+    instruction: "방향키로 움직여서 '버섯'만 삭제해!",
     type: 'edit',
-    text: '유치원은 즐거워용',
+    text: '당근 오이 버섯 양파',
+    targetText: '당근 오이  양파',
+    requiredKey: 'Arrow',
+    hint: "마우스 대신 방향키로 커서를 옮겨봐!",
+    failMsg: "방향키로 커서를 정확하게 옮겨야 해!"
+  },
+  {
+    id: 6,
+    level: '심화',
+    title: "순간이동 점프 (Home/End)",
+    bg: BG_BUS,
+    dialogue: [
+      { speaker: 'VILLAIN', text: "문장이 이렇게 긴데 언제 맨 앞까지 갈 거냐!" },
+      { speaker: 'SHIN', text: "후후... 저에겐 'Home'과 'End'라는 순간이동 장치가 있죠!" },
+      { speaker: 'ACTION', text: "좋아 짱구야! 단숨에 점프해!" }
+    ],
+    instruction: "Home 키를 눌러 맨 앞으로 가서 '성공!'을 적어!",
+    type: 'nav',
+    text: '미션 완료',
+    targetText: '성공!미션 완료',
+    requiredKey: 'Home',
+    hint: "Home은 맨 앞으로, End는 맨 뒤로!",
+    failMsg: "Home 키를 눌러서 한 번에 이동해 봐!"
+  },
+  {
+    id: 7,
+    level: '마스터',
+    title: "비밀의 공간 (Tab)",
+    bg: BG_SCHOOL,
+    dialogue: [
+      { speaker: 'VILLAIN', text: "글자 사이를 일정하게 띄우는 건 아주 어려운 기술이지!" },
+      { speaker: 'ACTION', text: "짱구야! 'Tab' 키를 사용하면 일정한 마법의 공간을 만들 수 있어!" },
+      { speaker: 'SHIN', text: "탭! 탭! 탭! 공간 이동!" }
+    ],
+    instruction: "글자 사이에 Tab 키를 눌러 간격을 벌려봐!",
+    type: 'edit',
+    text: '이름:나짱구',
+    targetText: '이름:\t나짱구',
+    requiredKey: 'Tab',
+    hint: "Space보다 훨씬 멀리 점프하는 Tab 키!",
+    failMsg: "Tab 키를 사용해서 간격을 벌려야 해!"
+  },
+  {
+    id: 8,
+    level: '마스터',
+    title: "위기 탈출 (Esc)",
+    bg: BG_KITCHEN,
+    dialogue: [
+      { speaker: 'MOM', text: "짱구야! 컴퓨터에 이상한 창이 떴어! 빨리 꺼줘!" },
+      { speaker: 'SHIN', text: "걱정 마세요 엄마! 'Esc' 키 한방이면 끝나요!" },
+      { speaker: 'ACTION', text: "취소하거나 창을 닫을 땐 Esc가 최고지!" }
+    ],
+    instruction: "Esc 키를 눌러 위기에서 탈출해!",
+    type: 'esc_challenge',
+    text: '광고창이 떴습니다!!!',
+    targetKey: 'Escape',
+    description: "Esc 키를 누르면 다음 단계로 진행!",
+    failMsg: "Esc 키를 눌러야 창이 닫혀!"
+  },
+  {
+    id: 9,
+    level: '마스터',
+    title: "복제 로봇 (Ctrl+C/V)",
+    bg: BG_SCHOOL,
+    dialogue: [
+      { speaker: 'SHIN', text: "똑같은 글자를 여러 번 쓰기 힘들어요..." },
+      { speaker: 'ACTION', text: "그럴 땐 복제 마법 'Ctrl+C'와 'Ctrl+V'를 쓰는 거야!" },
+      { speaker: 'ACTION', text: "글자를 선택하고 복사해서 붙여넣어 봐!" }
+    ],
+    instruction: "문장을 복사해서 입력창에 붙여넣어!",
+    type: 'shortcut',
+    text: '액션가면 최고!',
+    targetAction: 'paste',
+    hint: "Ctrl+A(전체선택) -> Ctrl+C(복사) -> Ctrl+V(붙여넣기)",
+    failMsg: "단축키를 순서대로 잘 사용해 봐!"
+  },
+  {
+    id: 10,
+    level: '보스',
+    title: "두목님의 마지막 일격",
+    bg: BG_SCHOOL,
+    dialogue: [
+      { speaker: 'VILLAIN', text: "하하하! 내 긴 문장을 오타 없이 수정할 수 있을까?" },
+      { speaker: 'SHIN', text: "액션가면님, 힘을 빌려주세요!" },
+      { speaker: 'ACTION', text: "짱구야, 지금까지 배운 모든 키를 사용하는 거다! 최종 결전이다!" }
+    ],
+    instruction: "모든 기술을 동원해 문장을 완성해!",
+    type: 'edit',
+    text: '유치원은지저분해용',
     targetText: '유치원은\n정말 즐거워!!',
-    hint: "Enter로 줄 바꾸기, Delete로 지우기, Shift로 쌍자음!!",
-    failMsg: "포기하지 마! 모든 키를 조합해서 완성하는 거야!"
+    requiredKey: 'All',
+    hint: "Enter로 줄 바꾸기, Shift로 쌍자음, Delete/Backspace로 지우기!",
+    failMsg: "포기하지 마! 끝까지 완성하는 거야!"
   }
 ];
 
 export default function App() {
   const [view, setView] = useState('main');
   const [currentStage, setCurrentStage] = useState(0);
+  const [currentDialogueIdx, setCurrentDialogueIdx] = useState(0);
   const [gameState, setGameState] = useState({
     input: '',
     completed: false,
@@ -133,11 +255,15 @@ export default function App() {
     targetIdx: 0,
     isCtrlPressed: false,
     clipboard: '',
-    showError: false
+    showError: false,
+    showKeyboardMap: false,
+    lastKeyPressed: '',
+    viewMode: 'dialogue' // 'dialogue' or 'play'
   });
 
   const startLevel = (idx) => {
     setCurrentStage(idx);
+    setCurrentDialogueIdx(0);
     const stage = STAGES[idx];
     setGameState({
       input: (stage.type === 'typing' || stage.type === 'shortcut') ? '' : stage.text,
@@ -146,22 +272,51 @@ export default function App() {
       targetIdx: 0,
       isCtrlPressed: false,
       clipboard: '',
-      showError: false
+      showError: false,
+      showKeyboardMap: false,
+      lastKeyPressed: '',
+      viewMode: 'dialogue'
     });
     setView('game');
   };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (view !== 'game') return;
+      if (view !== 'game' || gameState.viewMode !== 'play') return;
+      
+      const stage = STAGES[currentStage];
+      setGameState(prev => ({ ...prev, lastKeyPressed: e.key }));
+
+      // Esc Challenge 특수 처리
+      if (stage.type === 'esc_challenge' && e.key === 'Escape') {
+        setGameState(prev => ({ ...prev, completed: true }));
+        return;
+      }
+
+      // 특정 키 사용 강제 로직
+      if (stage.requiredKey) {
+        if (stage.requiredKey === 'Backspace' && e.key === 'Delete') {
+          e.preventDefault();
+          setGameState(prev => ({ ...prev, showError: true, message: "Backspace를 사용해야 해요!" }));
+          return;
+        }
+        if (stage.requiredKey === 'Delete' && e.key === 'Backspace') {
+          e.preventDefault();
+          setGameState(prev => ({ ...prev, showError: true, message: "Delete를 사용해야 해요!" }));
+          return;
+        }
+        if (stage.requiredKey === 'Enter' && e.key !== 'Enter' && !e.key.startsWith('Arrow') && e.key !== 'Backspace' && e.key !== 'Delete') {
+           // Enter 미션인데 글자를 치려고 하면? (선택적)
+        }
+      }
+
       if (e.ctrlKey) {
         setGameState(prev => ({ ...prev, isCtrlPressed: true }));
-        const stage = STAGES[currentStage];
         if (stage.type === 'shortcut') {
           const key = e.key.toLowerCase();
           if (key === 'c') {
             e.preventDefault();
-            setGameState(prev => ({ ...prev, message: '📋 복사 성공! 이제 붙여넣어!', clipboard: stage.text }));
+            setGameState(prev => ({ ...prev, message: '📋 복사 성공!', clipboard: stage.text }));
           } else if (key === 'v') {
             e.preventDefault();
             if (gameState.clipboard === stage.text) {
@@ -177,7 +332,7 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     return () => { window.removeEventListener('keydown', handleKeyDown); window.removeEventListener('keyup', handleKeyUp); };
-  }, [view, currentStage, gameState.clipboard]);
+  }, [view, currentStage, gameState.viewMode, gameState.clipboard]);
 
   const handleInputChange = (e) => {
     const val = e.target.value;
@@ -218,6 +373,7 @@ export default function App() {
         </div>
         <div className="flex gap-2">
           <button onClick={() => setView('theory')} className="px-4 py-2 rounded-xl font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm">비밀 지도</button>
+          <button onClick={() => setGameState(prev => ({ ...prev, showKeyboardMap: true }))} className="px-4 py-2 rounded-xl font-bold bg-blue-500 text-white shadow-md hover:bg-blue-600 text-sm">키보드 지도</button>
           <button onClick={() => startLevel(0)} className="px-4 py-2 rounded-xl font-bold bg-yellow-500 text-white shadow-md hover:bg-yellow-600 text-sm">연습 게임</button>
         </div>
       </nav>
@@ -262,7 +418,13 @@ export default function App() {
         {/* 이론 공부 */}
         {view === 'theory' && (
           <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-            <h2 className="text-4xl font-black text-center text-blue-600 mb-10 underline underline-offset-8 decoration-blue-200">키보드 비밀 지도 🗺️</h2>
+            <h2 className="text-4xl font-black text-center text-blue-600 mb-6 underline underline-offset-8 decoration-blue-200">키보드 비밀 지도 🗺️</h2>
+            
+            <div className="bg-white p-6 rounded-[40px] shadow-xl border-4 border-blue-100 overflow-hidden">
+                <p className="text-center font-bold text-slate-500 mb-6">"이 버튼들이 어디에 있는지, 무엇을 하는지 잘 살펴봐!"</p>
+                <img src={KEY_EXPLANATION_IMG} alt="Key Guide" className="w-full rounded-2xl shadow-inner border-2 border-slate-100" />
+            </div>
+
             <div className="grid gap-6">
               {KEYBOARD_THEORY.map(section => (
                 <div key={section.id} className="bg-white p-8 rounded-[40px] shadow-lg border-2 border-slate-50 overflow-hidden relative">
@@ -293,151 +455,184 @@ export default function App() {
 
         {/* 게임 화면 */}
         {view === 'game' && (
-          <div className="animate-in zoom-in-95 duration-500 max-w-2xl mx-auto">
-            {/* 상단 대화 영역 */}
-            <div className="flex items-start justify-between mb-8 gap-4">
-              <div className="flex-1 space-y-4">
-                <div className="bg-white px-6 py-4 rounded-3xl border-4 border-blue-400 relative shadow-md">
-                  <div className="absolute -left-3 top-4 w-4 h-4 bg-white border-l-4 border-t-4 border-blue-400 rotate-[-45deg]"></div>
-                  <p className="font-black text-blue-700 text-sm leading-tight italic">"{STAGES[currentStage].charSay}"</p>
-                </div>
-                <div className="bg-red-50 px-6 py-4 rounded-3xl border-4 border-red-400 relative shadow-md self-end ml-10">
-                  <div className="absolute -right-3 top-4 w-4 h-4 bg-red-50 border-r-4 border-t-4 border-red-400 rotate-[45deg]"></div>
-                  <p className="font-black text-red-700 text-sm leading-tight">"{STAGES[currentStage].villainSay}"</p>
-                </div>
-              </div>
-              <div className="flex flex-col items-center shrink-0">
-                <img src={VILLAIN_IMG} alt="Villain" className="w-20 h-20 rounded-2xl shadow-xl border-4 border-white mb-2" />
-                <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">BOSS</span>
-              </div>
+          <div className="animate-in zoom-in-95 duration-500 max-w-2xl mx-auto relative min-h-[600px] flex flex-col justify-center">
+            
+            {/* 배경 이미지 */}
+            <div className="absolute inset-0 -z-10 overflow-hidden rounded-[50px] opacity-20 blur-[2px]">
+              <img src={STAGES[currentStage].bg} alt="Background" className="w-full h-full object-cover" />
             </div>
 
-            <div className="bg-white rounded-[50px] p-8 md:p-12 shadow-2xl border-b-[16px] border-slate-200 relative overflow-hidden">
-              <div className="absolute top-4 left-6">
-                <span className="text-xs font-black uppercase tracking-widest text-slate-300">Level {STAGES[currentStage].level}</span>
-              </div>
-
-              <div className="text-center space-y-10">
-                <div>
-                  <h3 className="text-3xl font-black text-slate-900 mb-2">{STAGES[currentStage].title}</h3>
-                  <p className="text-lg font-bold text-yellow-600">{STAGES[currentStage].instruction}</p>
-                </div>
-
-                <div className="min-h-[140px] flex flex-col justify-center items-center">
-                  {STAGES[currentStage].type === 'typing' ? (
-                    <div className="space-y-4">
-                      <div className="text-7xl font-black text-slate-900 tracking-tight drop-shadow-sm">
-                        {STAGES[currentStage].targets[gameState.targetIdx]}
-                      </div>
-                      <div className="flex justify-center gap-2">
-                        {STAGES[currentStage].targets.map((_, i) => (
-                          <div key={i} className={`w-3 h-3 rounded-full ${i === gameState.targetIdx ? 'bg-yellow-500 w-10' : i < gameState.targetIdx ? 'bg-green-400' : 'bg-slate-200'} transition-all duration-300`} />
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full">
-                      <div className="text-3xl font-black text-slate-700 bg-slate-50 p-8 rounded-[35px] border-4 border-dashed border-slate-200 whitespace-pre-wrap leading-relaxed shadow-inner">
-                        {STAGES[currentStage].targetText || STAGES[currentStage].text}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="relative">
-                  {/* 반복 숙달 안내 (에러 메시지) */}
-                  {gameState.showError && (
-                    <div className="absolute -top-20 left-0 right-0 flex justify-center animate-in slide-in-from-top-4 duration-300">
-                      <div className="bg-red-600 text-white px-8 py-4 rounded-2xl font-black shadow-2xl flex items-center gap-3 border-4 border-white">
-                        <img src={VILLAIN_IMG} className="w-8 h-8 rounded-full" alt="" />
-                        {gameState.message}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className={`absolute -top-12 left-6 flex gap-2 transition-all ${gameState.isCtrlPressed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
-                    <div className="bg-blue-600 text-white px-5 py-1.5 rounded-xl font-black text-sm shadow-lg border-2 border-white">Ctrl 기술 발동!</div>
-                  </div>
-
-                  {STAGES[currentStage].type === 'edit' || STAGES[currentStage].id === 5 ? (
-                    <textarea
-                      value={gameState.input}
-                      onChange={handleInputChange}
-                      disabled={gameState.completed}
-                      autoFocus
-                      spellCheck={false}
-                      className={`w-full text-3xl p-8 rounded-[35px] border-[6px] transition-all text-center outline-none shadow-inner font-black h-40 resize-none leading-relaxed ${gameState.completed
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : gameState.showError ? 'border-red-500 bg-red-50 shake' : 'border-slate-100 focus:border-yellow-400 bg-slate-50 focus:bg-white'
-                        }`}
-                      placeholder="정확하게 입력해줘!"
+            {/* 대화 화면 모드 */}
+            {gameState.viewMode === 'dialogue' ? (
+              <div className="bg-white/90 backdrop-blur-md rounded-[50px] p-8 shadow-2xl border-4 border-yellow-400 flex flex-col items-center justify-center space-y-8 animate-in slide-in-from-bottom-12 duration-500">
+                <div className="flex items-center gap-8">
+                  <div className="relative">
+                    <img 
+                      src={
+                        STAGES[currentStage].dialogue[currentDialogueIdx].speaker === 'SHIN' ? SHIN_IMG :
+                        STAGES[currentStage].dialogue[currentDialogueIdx].speaker === 'MOM' ? MOM_IMG :
+                        STAGES[currentStage].dialogue[currentDialogueIdx].speaker === 'DAD' ? DAD_IMG :
+                        STAGES[currentStage].dialogue[currentDialogueIdx].speaker === 'ACTION' ? ACTION_MASK_IMG :
+                        VILLAIN_IMG
+                      } 
+                      alt="Speaker" 
+                      className="w-32 h-32 drop-shadow-xl animate-bounce"
                     />
-                  ) : (
-                    <input
-                      type="text"
-                      value={gameState.input}
-                      onChange={handleInputChange}
-                      disabled={gameState.completed}
-                      autoFocus
-                      spellCheck={false}
-                      className={`w-full text-4xl p-10 rounded-[45px] border-[6px] transition-all text-center outline-none shadow-inner font-black ${gameState.completed
-                          ? 'border-green-500 bg-green-50 text-green-700'
-                          : gameState.showError ? 'border-red-500 bg-red-50 shake' : 'border-slate-100 focus:border-yellow-400 bg-slate-50 focus:bg-white'
-                        }`}
-                      placeholder="여기에 입력!"
-                    />
-                  )}
+                    <div className="absolute -top-2 -left-2 bg-yellow-400 text-white px-3 py-1 rounded-full font-black text-sm border-2 border-white shadow-md">
+                      {STAGES[currentStage].dialogue[currentDialogueIdx].speaker}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-slate-50 p-8 rounded-3xl border-4 border-slate-100 w-full relative">
+                  <p className="text-2xl font-black text-slate-800 text-center leading-relaxed">
+                    "{STAGES[currentStage].dialogue[currentDialogueIdx].text}"
+                  </p>
+                  <div className="absolute -top-4 left-10 w-8 h-8 bg-slate-50 border-l-4 border-t-4 border-slate-100 rotate-45"></div>
+                </div>
 
-                  {!gameState.showError && gameState.message && !gameState.completed && (
-                    <div className="mt-6 font-black text-blue-600 text-xl flex justify-center items-center gap-2 animate-pulse">
-                      <Sparkles size={24} /> {gameState.message}
+                <button 
+                  onClick={() => {
+                    if (currentDialogueIdx < STAGES[currentStage].dialogue.length - 1) {
+                      setCurrentDialogueIdx(prev => prev + 1);
+                    } else {
+                      setGameState(prev => ({ ...prev, viewMode: 'play' }));
+                    }
+                  }}
+                  className="bg-yellow-500 text-white px-10 py-4 rounded-full font-black text-xl shadow-xl hover:bg-yellow-600 transition-all flex items-center gap-2 group"
+                >
+                  {currentDialogueIdx < STAGES[currentStage].dialogue.length - 1 ? '다음 대화' : '미션 시작!'}
+                  <ArrowRight className="group-hover:translate-x-2 transition-transform" />
+                </button>
+              </div>
+            ) : (
+              /* 플레이 화면 모드 */
+              <div className="space-y-6">
+                <div className="flex items-start justify-between mb-2 gap-4">
+                  <div className="flex-1">
+                    <div className="bg-white/90 backdrop-blur-md px-6 py-4 rounded-3xl border-4 border-blue-400 relative shadow-md">
+                      <div className="absolute -left-3 top-4 w-4 h-4 bg-white border-l-4 border-t-4 border-blue-400 rotate-[-45deg]"></div>
+                      <p className="font-black text-blue-700 text-sm leading-tight italic">"{STAGES[currentStage].instruction}"</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center shrink-0">
+                    <img src={STAGES[currentStage].level === '보스' ? VILLAIN_IMG : ACTION_MASK_IMG} alt="Guide" className="w-16 h-16 rounded-2xl shadow-xl border-4 border-white mb-2" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-[50px] p-8 md:p-12 shadow-2xl border-b-[16px] border-slate-200 relative overflow-hidden">
+                  <div className="absolute top-4 left-6">
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-300">Level {STAGES[currentStage].level} - Stage {STAGES[currentStage].id}</span>
+                  </div>
+
+                  <div className="text-center space-y-10">
+                    <div>
+                      <h3 className="text-3xl font-black text-slate-900 mb-2">{STAGES[currentStage].title}</h3>
+                      <p className="text-lg font-bold text-yellow-600">{STAGES[currentStage].instruction}</p>
+                    </div>
+
+                    <div className="min-h-[140px] flex flex-col justify-center items-center">
+                      {STAGES[currentStage].type === 'typing' ? (
+                        <div className="space-y-4">
+                          <div className="text-7xl font-black text-slate-900 tracking-tight drop-shadow-sm">
+                            {STAGES[currentStage].targets[gameState.targetIdx]}
+                          </div>
+                          <div className="flex justify-center gap-2">
+                            {STAGES[currentStage].targets.map((_, i) => (
+                              <div key={i} className={`w-3 h-3 rounded-full ${i === gameState.targetIdx ? 'bg-yellow-500 w-10' : i < gameState.targetIdx ? 'bg-green-400' : 'bg-slate-200'} transition-all duration-300`} />
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="w-full">
+                          <div className="text-3xl font-black text-slate-700 bg-slate-50 p-8 rounded-[35px] border-4 border-dashed border-slate-200 whitespace-pre-wrap leading-relaxed shadow-inner">
+                            {STAGES[currentStage].targetText || STAGES[currentStage].text}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="relative">
+                      {gameState.showError && (
+                        <div className="absolute -top-20 left-0 right-0 flex justify-center animate-in slide-in-from-top-4 duration-300">
+                          <div className="bg-red-600 text-white px-8 py-4 rounded-2xl font-black shadow-2xl flex items-center gap-3 border-4 border-white">
+                            <Zap className="animate-pulse" />
+                            {gameState.message || "정확한 키를 사용하세요!"}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className={`absolute -top-12 left-6 flex gap-2 transition-all ${gameState.isCtrlPressed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
+                        <div className="bg-blue-600 text-white px-5 py-1.5 rounded-xl font-black text-sm shadow-lg border-2 border-white">Ctrl 기술 발동!</div>
+                      </div>
+
+                      {STAGES[currentStage].type === 'typing' ? (
+                        <input
+                          type="text"
+                          value={gameState.input}
+                          onChange={handleInputChange}
+                          disabled={gameState.completed}
+                          autoFocus
+                          spellCheck={false}
+                          className={`w-full text-4xl p-10 rounded-[45px] border-[6px] transition-all text-center outline-none shadow-inner font-black ${gameState.completed
+                              ? 'border-green-500 bg-green-50 text-green-700'
+                              : gameState.showError ? 'border-red-500 bg-red-50 shake' : 'border-slate-100 focus:border-yellow-400 bg-slate-50 focus:bg-white'
+                            }`}
+                          placeholder="여기에 입력!"
+                        />
+                      ) : (
+                        <textarea
+                          value={gameState.input}
+                          onChange={handleInputChange}
+                          disabled={gameState.completed}
+                          autoFocus
+                          spellCheck={false}
+                          className={`w-full text-3xl p-8 rounded-[35px] border-[6px] transition-all text-center outline-none shadow-inner font-black h-40 resize-none leading-relaxed ${gameState.completed
+                              ? 'border-green-500 bg-green-50 text-green-700'
+                              : gameState.showError ? 'border-red-500 bg-red-50 shake' : 'border-slate-100 focus:border-yellow-400 bg-slate-50 focus:bg-white'
+                            }`}
+                          placeholder="미션 수행 중..."
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 성공 결과 */}
+                  {gameState.completed && (
+                    <div className="absolute inset-0 bg-yellow-400/95 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500 p-8 text-center z-50 rounded-[50px]">
+                      <img src={ACTION_MASK_IMG} alt="Happy" className="w-56 h-56 mb-4 animate-bounce" />
+                      <h3 className="text-6xl font-black text-white mb-2 italic drop-shadow-lg tracking-tighter">"으하하! 미션 성공!"</h3>
+                      <p className="text-2xl text-yellow-900 font-bold mb-10">다음 단계로 넘어가보자!</p>
+
+                      <div className="flex gap-4">
+                        {currentStage < STAGES.length - 1 ? (
+                          <button
+                            onClick={() => startLevel(currentStage + 1)}
+                            className="bg-white text-yellow-600 px-12 py-6 rounded-[30px] font-black text-3xl hover:bg-slate-50 transition-all flex items-center gap-3 shadow-2xl active:scale-95 border-b-8 border-slate-200"
+                          >
+                            다음 단계 <ArrowRight size={32} />
+                          </button>
+                        ) : (
+                          <div className="space-y-6">
+                            <div className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-xl shadow-xl">🏆 전설의 키보드 수호대 탄생!</div>
+                            <button
+                              onClick={() => setView('main')}
+                              className="bg-white text-slate-900 px-12 py-6 rounded-[30px] font-black text-3xl hover:bg-slate-50 transition-all flex items-center gap-3 shadow-2xl mx-auto border-b-8 border-slate-200"
+                            >
+                              처음으로 <RotateCcw size={32} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
-
-                {STAGES[currentStage].hint && (
-                  <div className="bg-amber-50 px-6 py-3 rounded-2xl border-2 border-amber-100 inline-block">
-                    <p className="text-amber-700 font-bold text-sm flex items-center gap-2">
-                      <Info size={18} /> 액션 힌트: {STAGES[currentStage].hint}
-                    </p>
-                  </div>
-                )}
               </div>
+            )}
 
-              {/* 성공 결과 */}
-              {gameState.completed && (
-                <div className="absolute inset-0 bg-yellow-400/95 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500 p-8 text-center z-50 rounded-[50px]">
-                  <img src={ACTION_MASK_IMG} alt="Happy" className="w-56 h-56 mb-4 animate-bounce" />
-                  <h3 className="text-6xl font-black text-white mb-2 italic drop-shadow-lg tracking-tighter">"으하하! 정의의 승리다!"</h3>
-                  <p className="text-2xl text-yellow-900 font-bold mb-10">두목님도 네 실력에 깜짝 놀랐을 거야!</p>
-
-                  <div className="flex gap-4">
-                    {currentStage < STAGES.length - 1 ? (
-                      <button
-                        onClick={() => startLevel(currentStage + 1)}
-                        className="bg-white text-yellow-600 px-12 py-6 rounded-[30px] font-black text-3xl hover:bg-slate-50 transition-all flex items-center gap-3 shadow-2xl active:scale-95 border-b-8 border-slate-200"
-                      >
-                        다음 미션 <ArrowRight size={32} />
-                      </button>
-                    ) : (
-                      <div className="space-y-6">
-                        <div className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-xl shadow-xl">🏆 당신은 유치원 키보드 마스터!</div>
-                        <button
-                          onClick={() => setView('main')}
-                          className="bg-white text-slate-900 px-12 py-6 rounded-[30px] font-black text-3xl hover:bg-slate-50 transition-all flex items-center gap-3 shadow-2xl mx-auto border-b-8 border-slate-200"
-                        >
-                          처음으로 <RotateCcw size={32} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-12 flex justify-center gap-4">
+            <div className="mt-8 flex justify-center gap-2 overflow-x-auto py-4">
               {STAGES.map((s, i) => (
-                <div key={i} className={`h-4 rounded-full transition-all duration-700 ${i === currentStage ? 'w-24 bg-yellow-500 shadow-lg shadow-yellow-200' : (i < currentStage ? 'bg-green-400 w-8' : 'w-8 bg-slate-200')}`} />
+                <div key={i} className={`h-3 rounded-full transition-all duration-700 shrink-0 ${i === currentStage ? 'w-12 bg-yellow-500 shadow-lg' : (i < currentStage ? 'bg-green-400 w-4' : 'w-4 bg-slate-200')}`} />
               ))}
             </div>
           </div>
@@ -458,6 +653,45 @@ export default function App() {
           </p>
         </div>
       </footer>
+
+      {/* 키보드 지도 모달 */}
+      {gameState.showKeyboardMap && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-white w-full max-w-4xl rounded-[40px] p-8 shadow-2xl relative animate-in zoom-in-95 duration-300">
+            <button 
+              onClick={() => setGameState(prev => ({ ...prev, showKeyboardMap: false }))}
+              className="absolute -top-4 -right-4 bg-red-500 text-white w-12 h-12 rounded-full font-black text-2xl shadow-lg border-4 border-white hover:scale-110 transition-transform"
+            >
+              X
+            </button>
+            <div className="text-center mb-6">
+              <h3 className="text-3xl font-black text-slate-900 flex items-center justify-center gap-3">
+                <Keyboard size={36} className="text-blue-500" /> 키보드 비밀 지도
+              </h3>
+              <p className="text-slate-500 font-bold mt-2">"버튼들이 어디 있는지 잘 찾아봐!"</p>
+            </div>
+            <div className="bg-slate-50 p-4 rounded-3xl border-4 border-dashed border-slate-200">
+              <img src={KEYBOARD_LAYOUT_IMG} alt="Keyboard Layout" className="w-full rounded-xl shadow-md" />
+            </div>
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              <div className="bg-blue-50 p-4 rounded-2xl border-2 border-blue-100 flex items-center gap-4">
+                <div className="bg-white p-3 rounded-xl shadow-sm border border-blue-200"><BackspaceIcon className="text-blue-600" /></div>
+                <div>
+                   <p className="font-black text-blue-700">지우기 왕</p>
+                   <p className="text-xs text-blue-500 font-bold">Backspace & Delete</p>
+                </div>
+              </div>
+              <div className="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 flex items-center gap-4">
+                <div className="bg-white p-3 rounded-xl shadow-sm border border-yellow-200"><ArrowUp className="text-yellow-600" /></div>
+                <div>
+                   <p className="font-black text-yellow-700">변신 기술</p>
+                   <p className="text-xs text-yellow-500 font-bold">Shift 키 활용</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Shake 애니메이션 스타일 */}
       <style>{`
