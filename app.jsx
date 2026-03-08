@@ -49,7 +49,8 @@ const KEYBOARD_THEORY = [
     title: '변신 기술 (조합/이동)',
     keys: [
       { name: 'Shift (쉬프트)', desc: '쌍자음 파워! 누른 채로 자음을 누르면 강해져요.', icon: <ArrowUp size={20} />, matchKey: 'Shift' },
-      { name: 'Home/End (홈/엔드)', desc: '줄의 처음과 끝으로 순간이동하는 고급 기술!', icon: <MoveHorizontal size={20} />, matchKey: 'Home' },
+      { name: 'Home (홈)', desc: '줄의 처음으로 순간이동하는 고급 기술!', icon: <MoveHorizontal size={20} />, matchKey: 'Home' },
+      { name: 'End (엔드)', desc: '줄의 끝으로 순간이동하는 고급 기술!', icon: <MoveHorizontal size={20} />, matchKey: 'End' },
     ]
   },
   {
@@ -57,7 +58,7 @@ const KEYBOARD_THEORY = [
     title: '마법의 복제술 (단축키)',
     keys: [
       { name: 'Ctrl + C/V (컨트롤 C/V)', desc: '에너지를 복사해서 무한으로 붙여넣는 마법!', icon: <Copy size={20} />, matchKey: 'Control' },
-      { name: 'Ctrl + A (컨트롤 A)', desc: '화면의 모든 에너지를 한꺼번에 선택해요.', icon: <Target size={20} />, matchKey: 'a' },
+      { name: 'Ctrl + A (컨트롤 A)', desc: '화면의 모든 에너지를 한꺼번에 선택해요.', icon: <Target size={20} />, matchKey: 'Control' },
     ]
   }
 ];
@@ -78,6 +79,7 @@ const STAGES = [
     text: '사과 배 사탕 고기',
     targetText: '사과 배  고기',
     requiredKey: 'Backspace',
+    initialCursorPos: 7, // '사탕' 뒤
     hint: "글자 뒤에 커서를 두고 Backspace를 눌러!",
     failMsg: "Backspace 키를 정확히 사용해야 해!"
   },
@@ -96,11 +98,13 @@ const STAGES = [
     text: '이 서류는 꽝입니다',
     targetText: '이 서류는 입니다',
     requiredKey: 'Delete',
+    initialCursorPos: 5, // '꽝' 앞
     hint: "커서를 '는'과 '꽝' 사이에 두고 Delete를 눌러!",
     failMsg: "Delete 키를 사용해야 해! (Backspace는 안돼요)"
   },
   {
     id: 3,
+// ... (omitted)
     level: '기초',
     title: "유치원 버스 알림 (Enter / 엔터)",
     bg: BG_BUS,
@@ -308,12 +312,29 @@ export default function App() {
     if (view === 'game' && gameState.viewMode === 'play' && inputRef.current) {
       inputRef.current.focus();
       const stage = STAGES[currentStage];
-      if (stage.requiredKey === 'Home' || stage.id === 6) {
+      
+      if (stage.initialCursorPos !== undefined) {
+        inputRef.current.setSelectionRange(stage.initialCursorPos, stage.initialCursorPos);
+      } else if (stage.requiredKey === 'Home' || stage.id === 6) {
         const len = inputRef.current.value.length;
         inputRef.current.setSelectionRange(len, len);
       }
     }
   }, [view, gameState.viewMode, currentStage]);
+
+  // 강력한 포커스 유지 (Sticky Focus)
+  useEffect(() => {
+    if (view === 'game' && gameState.viewMode === 'play') {
+      const handleGlobalClick = (e) => {
+        // 모달이나 네비게이션 클릭이 아닐 경우 항상 입력창에 포커스
+        if (inputRef.current && !gameState.showKeyboardMap) {
+           setTimeout(() => inputRef.current.focus(), 10);
+        }
+      };
+      window.addEventListener('mousedown', handleGlobalClick);
+      return () => window.removeEventListener('mousedown', handleGlobalClick);
+    }
+  }, [view, gameState.viewMode, gameState.showKeyboardMap]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -371,6 +392,20 @@ export default function App() {
     const val = e.target.value;
     const stage = STAGES[currentStage];
     setGameState(prev => ({ ...prev, showError: false }));
+
+    // 문장 보호 (Anti-Vandalism)
+    // 'edit' 타입 미션에서 정답 문장에 포함된 글자들을 과하게 지우는 것 방지
+    if (stage.type === 'edit') {
+        const targetParts = stage.targetText.split('');
+        let testVal = val.replace(/\r/g, "");
+        // 정답 텍스트에 있는 글자 중 하나라도 파괴되었는지 확인 (단순 비교)
+        // 아주 엄격하게 하기보다, 전체 길이가 너무 짧아지면 경고
+        if (testVal.length < stage.targetText.length - 2) {
+             setGameState(prev => ({ ...prev, showError: true, message: "너무 많이 지웠어요! 다시 해볼까요?" }));
+             setGameState(prev => ({ ...prev, input: stage.text })); // 강제 복구
+             return;
+        }
+    }
 
     let isMatch = false;
     if (stage.type === 'typing') {
