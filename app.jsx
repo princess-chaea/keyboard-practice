@@ -449,13 +449,43 @@ export default function App() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-              <button onClick={() => setView('theory')} className="bg-white p-8 rounded-[40px] border-4 border-yellow-200 hover:border-yellow-400 text-left transition-all hover:-translate-y-2 shadow-xl group">
-                <BookOpen className="text-blue-500 mb-4 group-hover:scale-125 transition-transform" size={40} />
+              <button 
+                onClick={() => setView('theory')} 
+                className={`bg-white p-8 rounded-[40px] border-4 transition-all hover:-translate-y-2 shadow-xl group text-left ${
+                  foundKeys.size === totalKeys 
+                    ? 'border-green-200 hover:border-green-400' 
+                    : 'border-yellow-200 hover:border-yellow-400'
+                }`}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <BookOpen className="text-blue-500 group-hover:scale-125 transition-transform" size={40} />
+                  {foundKeys.size === totalKeys && <CheckCircle2 className="text-green-500 animate-bounce" />}
+                </div>
                 <h3 className="text-2xl font-black mb-1 text-slate-900">1. 마법 지도 공부 (키보드)</h3>
-                <p className="text-slate-500 font-bold">먼저 버튼들의 비밀을 그림으로 배워요!</p>
+                <p className="text-slate-500 font-bold">먼저 버튼들의 비밀을{foundKeys.size === totalKeys ? ' 모두 익혔어요!' : ' 그림으로 배워요!'}</p>
+                <div className="mt-4 w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-500 transition-all duration-500" style={{ width: `${(foundKeys.size / totalKeys) * 100}%` }} />
+                </div>
               </button>
-              <button onClick={() => startLevel(0)} className="bg-white p-8 rounded-[40px] border-4 border-slate-100 hover:border-red-400 text-left transition-all hover:-translate-y-2 shadow-xl group">
-                <Sword className="text-red-500 mb-4 group-hover:scale-125 transition-transform" size={40} />
+              
+              <button 
+                onClick={() => foundKeys.size === totalKeys ? startLevel(0) : null} 
+                disabled={foundKeys.size !== totalKeys}
+                className={`p-8 rounded-[40px] border-4 text-left transition-all shadow-xl group relative overflow-hidden ${
+                  foundKeys.size === totalKeys 
+                    ? 'bg-white border-slate-100 hover:border-red-400 hover:-translate-y-2 cursor-pointer' 
+                    : 'bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed'
+                }`}
+              >
+                {! (foundKeys.size === totalKeys) && (
+                  <div className="absolute inset-0 bg-slate-900/5 flex items-center justify-center backdrop-blur-[1px]">
+                    <div className="bg-white px-4 py-2 rounded-full shadow-lg border-2 border-slate-200 flex items-center gap-2 transform -rotate-3">
+                      <Zap size={16} className="text-yellow-500" />
+                      <span className="text-xs font-black text-slate-600">지도를 먼저 완성해!</span>
+                    </div>
+                  </div>
+                )}
+                <Sword className={`${foundKeys.size === totalKeys ? 'text-red-500' : 'text-slate-400'} mb-4 group-hover:scale-125 transition-transform`} size={40} />
                 <h3 className="text-2xl font-black mb-1 text-slate-900">2. 두목님과 대결 (연습)</h3>
                 <p className="text-slate-500 font-bold">공부했나요? 이제 실전 대결로 넘어가요!</p>
               </button>
@@ -530,14 +560,23 @@ export default function App() {
             </div>
             <div className="text-center pt-6">
               <button 
-                onClick={() => startLevel(0)} 
-                className={`px-12 py-5 rounded-[30px] font-black text-2xl shadow-xl transition-all hover:scale-105 ${
+                onClick={() => foundKeys.size === totalKeys ? startLevel(0) : null} 
+                disabled={foundKeys.size !== totalKeys}
+                className={`px-12 py-5 rounded-[30px] font-black text-2xl shadow-xl transition-all relative overflow-hidden ${
                   foundKeys.size === totalKeys 
-                    ? 'bg-green-500 hover:bg-green-600 text-white animate-bounce' 
-                    : 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                    ? 'bg-green-500 hover:bg-green-600 text-white animate-bounce hover:scale-105 cursor-pointer' 
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed border-b-8 border-slate-300'
                 }`}
               >
-                {foundKeys.size === totalKeys ? '충분히 익혔어요! 대결 시작!' : '실습 대결 시작! 하하하!'}
+                {foundKeys.size !== totalKeys && (
+                  <div className="absolute inset-0 bg-slate-900/5 flex items-center justify-center">
+                    <div className="bg-white/90 px-3 py-1 rounded-full shadow-sm border border-slate-200 flex items-center gap-1 scale-75">
+                      <Zap size={14} className="text-yellow-500" />
+                      <span className="text-[10px] font-black text-slate-600">모든 보물을 찾아야 대결할 수 있어!</span>
+                    </div>
+                  </div>
+                )}
+                {foundKeys.size === totalKeys ? '충분히 익혔어요! 대결 시작!' : '보물을 모두 찾아보세요!'}
               </button>
             </div>
           </div>
@@ -756,13 +795,13 @@ export default function App() {
                 <X size={28} />
               </button>
             </div>
-            <div className="p-8 space-y-6">
+            <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
               <div className="rounded-2xl border-4 border-slate-100 overflow-hidden shadow-inner">
-                <img src={KEYBOARD_LAYOUT_IMG} alt="Keyboard Map" className="w-full" />
+                <img src={KEY_EXPLANATION_IMG} alt="Keyboard Map" className="w-full" />
               </div>
               <div className="bg-blue-50 p-6 rounded-3xl border-2 border-blue-100">
                 <p className="text-blue-800 font-bold text-center leading-relaxed">
-                  "버튼의 위치를 잘 기억해 둬!<br />대결 도중에도 언제든지 확인할 수 있어."
+                  "각 버튼의 이름과 기능을 잘 기억해 둬!<br />지도를 잘 보면 적들을 쉽게 물리칠 수 있어."
                 </p>
               </div>
             </div>
