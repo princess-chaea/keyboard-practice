@@ -98,7 +98,7 @@ const STAGES = [
     text: '이 서류는 꽝입니다',
     targetText: '이 서류는 입니다',
     requiredKey: 'Delete',
-    initialCursorPos: 5, // '꽝' 앞
+    initialCursorPos: 6, // '꽝' 앞 (공백 뒤)
     hint: "커서를 '는'과 '꽝' 사이에 두고 Delete를 눌러!",
     failMsg: "Delete 키를 사용해야 해! (Backspace는 안돼요)"
   },
@@ -289,10 +289,12 @@ export default function App() {
   useEffect(() => {
     if (view === 'theory') {
       const handleTheoryKey = (e) => {
+        if (e.repeat) return; // 연속 입력 방지
         const key = e.key;
         KEYBOARD_THEORY.forEach(section => {
           section.keys.forEach(k => {
-            if (k.matchKey === key || (k.matchKey === 'Control' && e.ctrlKey)) {
+            // 정확한 매칭 (Shift 등 다른 키가 섞이지 않도록)
+            if (k.matchKey === key || (k.matchKey === 'Control' && key === 'Control')) {
               setFoundKeys(prev => {
                 const next = new Set(prev);
                 next.add(k.name);
@@ -343,12 +345,46 @@ export default function App() {
       const stage = STAGES[currentStage];
       setGameState(prev => ({ ...prev, lastKeyPressed: e.key }));
 
+      // Tab 키 방어 (포커스 나가는 것 방지 및 입력 처리)
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        if (stage.requiredKey === 'Tab') {
+            const start = e.target.selectionStart;
+            const end = e.target.selectionEnd;
+            const newVal = gameState.input.substring(0, start) + "\t" + gameState.input.substring(end);
+            setGameState(prev => ({ ...prev, input: newVal }));
+            // 다음 렌더링 후 커서 유지
+            setTimeout(() => {
+                if (inputRef.current) inputRef.current.setSelectionRange(start + 1, start + 1);
+            }, 0);
+        }
+        return;
+      }
+
+      // 미션에 따른 이동 제약 (Home/End 미션에서 방향키 금지)
+      if ((stage.requiredKey === 'Home' || stage.id === 6) && (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+        e.preventDefault();
+        setGameState(prev => ({ ...prev, showError: true, message: "방향키 대신 Home/End 키를 사용하세요!" }));
+        return;
+      }
+
       if (stage.type === 'esc_challenge' && e.key === 'Escape') {
         setGameState(prev => ({ ...prev, showSuccessEffect: true }));
         setTimeout(() => {
           setGameState(prev => ({ ...prev, completed: true, showSuccessEffect: false }));
         }, 1500);
         return;
+      }
+
+      // 부적절한 키 입력 차단 (타이핑형이 아닌 경우)
+      if (stage.type === 'edit' || stage.type === 'nav') {
+          // 글자/숫자 키 입력을 막고 오직 백스페이스, 딜리트, 방향키(제약 없을때), 엔터만 허용
+          const isActionKey = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter', 'Tab'].includes(e.key);
+          if (!isActionKey && e.key.length === 1 && !e.ctrlKey) {
+              e.preventDefault();
+              setGameState(prev => ({ ...prev, showError: true, message: "지금은 입력보다 키 기능을 익힐 때예요!" }));
+              return;
+          }
       }
 
       if (stage.requiredKey) {
@@ -449,8 +485,19 @@ export default function App() {
     <div className="min-h-screen bg-[#FFFBEB] text-slate-800 font-sans selection:bg-blue-200 focus-within:outline-none">
       {/* 네비게이션 */}
       <nav className="bg-white border-b-4 border-yellow-400 px-6 py-4 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView('main')}>
-          <div className="relative">
+        <div 
+            className="flex items-center gap-3 cursor-pointer group" 
+            onClick={() => {
+                if (view === 'game' && gameState.viewMode === 'play' && !gameState.completed) {
+                    if (window.confirm("대결 중이에요! 처음으로 돌아가면 진행 상황이 사라져요. 그래도 갈까요?")) {
+                        setView('main');
+                    }
+                } else {
+                    setView('main');
+                }
+            }}
+        >
+          <div className="relative group-hover:scale-110 transition-transform">
             <img src={ACTION_MASK_IMG} alt="Action" className="w-10 h-10" />
             <img src={SHIN_IMG} alt="Shin" className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full border border-white" />
           </div>
