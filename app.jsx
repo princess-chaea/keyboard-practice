@@ -220,6 +220,7 @@ const STAGES = [
     instruction: "문장을 마우스로 드래그해서 선택하고 Ctrl+C를 눌러 복사해!",
     type: 'shortcut',
     text: '액션가면 최고!',
+    targetText: '액션가면 최고!',
     targetAction: 'copy',
     hint: "마우스 왼쪽 버튼을 누른 채 글자 위를 슥~ 드래그하고 Ctrl+C를 눌러!",
     failMsg: "정확한 문장을 드래그해서 Ctrl+C를 눌러야 해!"
@@ -237,6 +238,7 @@ const STAGES = [
     instruction: "아래 입력창을 클릭한 후 Ctrl+V를 눌러서 문장을 붙여넣어!",
     type: 'shortcut',
     text: '액션가면 최고!',
+    targetText: '액션가면 최고!',
     targetAction: 'paste',
     hint: "입력창을 한 번 클릭하고 Ctrl+V를 눌러!",
     failMsg: "Ctrl+V를 눌러서 아까 복사한 문장을 붙여넣어봐!"
@@ -755,7 +757,7 @@ export default function App() {
                   <p className="text-2xl font-black text-slate-800 text-center leading-relaxed">
                     "{STAGES[currentStage].dialogue[currentDialogueIdx].text}"
                   </p>
-                  <div className="absolute -top-4 left-10 w-8 h-8 bg-slate-50 border-l-4 border-t-4 border-slate-100 rotate-45"></div>
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-slate-50 border-l-4 border-t-4 border-slate-100 rotate-45"></div>
                 </div>
 
                 <button 
@@ -775,14 +777,14 @@ export default function App() {
             ) : (
               <div className="space-y-6">
                 <div className="flex items-start justify-between mb-2 gap-4">
+                  <div className="flex flex-col items-center shrink-0">
+                    <img src={STAGES[currentStage].level === '보스' ? VILLAIN_IMG : ACTION_MASK_IMG} alt="Guide" className="w-16 h-16 rounded-2xl shadow-xl border-4 border-white mb-2" />
+                  </div>
                   <div className="flex-1">
                     <div className="bg-white/90 backdrop-blur-md px-6 py-4 rounded-3xl border-4 border-blue-400 relative shadow-md">
                       <div className="absolute -left-3 top-4 w-4 h-4 bg-white border-l-4 border-t-4 border-blue-400 rotate-[-45deg]"></div>
                       <p className="font-black text-blue-700 text-sm leading-tight italic">"{STAGES[currentStage].instruction}"</p>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-center shrink-0">
-                    <img src={STAGES[currentStage].level === '보스' ? VILLAIN_IMG : ACTION_MASK_IMG} alt="Guide" className="w-16 h-16 rounded-2xl shadow-xl border-4 border-white mb-2" />
                   </div>
                 </div>
 
