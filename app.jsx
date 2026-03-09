@@ -22,9 +22,10 @@ import {
 // --- 이미지 자산 ---
 const SHIN_IMG = "https://i.ibb.co/Q3yff3rD/image.png";
 const ACTION_MASK_IMG = "https://i.ibb.co/DHWzNQ5Q/image.png";
-const VILLAIN_IMG = "https://i.ibb.co/kgLsW9KH/image.png"; // 원장 선생님(두목님)
+const VILLAIN_IMG = 'https://i.ibb.co/Hn6S95z/villain.png';
 const DAD_IMG = "https://i.ibb.co/mCYbd379/image.png";
 const MOM_IMG = "https://i.ibb.co/mrhjXcdz/image.png";
+const FINAL_CELEBRATION_IMG = 'https://i.ibb.co/tTY85PVp/image.png';
 
 const BG_KITCHEN = "https://i.ibb.co/CxD7QVF/image.png";
 const BG_SCHOOL = "https://i.ibb.co/d0qVdCzg/image.png";
@@ -447,11 +448,16 @@ export default function App() {
         if (stage.type === 'shortcut') {
           const key = e.key.toLowerCase();
           if (key === 'c') {
-            // targetAction 이 copy 면 무조건 미션 성공으로 간주
+            // targetAction 이 copy 면 드래그로 선택된 텍스트가 있는지 확인
             if (stage.targetAction === 'copy') {
-                // e.preventDefault() 를 하지 않아야 실제 브라우저 복사가 일어남
-                setGameState(prev => ({ ...prev, clipboard: stage.text }));
-                checkCompletion(stage.text, stage); 
+                const selectedText = window.getSelection().toString().trim();
+                if (selectedText === stage.targetText) {
+                    setGameState(prev => ({ ...prev, clipboard: stage.text }));
+                    checkCompletion(stage.text, stage); 
+                } else {
+                    setGameState(prev => ({ ...prev, showError: true, message: "먼저 문장을 마우스로 드래그해서 파란색으로 선택해야 해요!" }));
+                    return;
+                }
             } else {
                 setGameState(prev => ({ ...prev, message: '📋 복사 성공!', clipboard: stage.text }));
             }
@@ -905,11 +911,20 @@ export default function App() {
 
                   {gameState.completed && (
                     <div className="absolute inset-0 bg-yellow-400/95 flex flex-col items-center justify-center animate-in fade-in zoom-in duration-500 p-8 text-center z-50 rounded-[50px]">
-                      <img src={ACTION_MASK_IMG} alt="Happy" className="w-56 h-56 mb-4 animate-bounce" />
-                      <h3 className="text-6xl font-black text-white mb-2 italic drop-shadow-lg tracking-tighter">"으하하! 미션 성공!"</h3>
-                      <p className="text-2xl text-yellow-900 font-bold mb-10">다음 단계로 넘어가보자!</p>
+                      {currentStage === STAGES.length - 1 ? (
+                        <div className="space-y-6">
+                           <img src={FINAL_CELEBRATION_IMG} alt="Together" className="w-[450px] h-auto mb-4 rounded-3xl shadow-2xl border-8 border-white animate-bounce" />
+                           <div className="bg-slate-900 text-white px-10 py-4 rounded-[25px] font-black text-2xl shadow-xl animate-in slide-in-from-bottom-4 duration-700">🏆 떡잎마을 키보드 수호대 탄생!</div>
+                        </div>
+                      ) : (
+                        <>
+                          <img src={ACTION_MASK_IMG} alt="Happy" className="w-56 h-56 mb-4 animate-bounce" />
+                          <h3 className="text-6xl font-black text-white mb-2 italic drop-shadow-lg tracking-tighter">"으하하! 미션 성공!"</h3>
+                          <p className="text-2xl text-yellow-900 font-bold mb-10">다음 단계로 넘어가보자!</p>
+                        </>
+                      )}
 
-                      <div className="flex gap-4">
+                      <div className="flex gap-4 mt-8">
                         {currentStage < STAGES.length - 1 ? (
                           <button
                             onClick={() => startLevel(currentStage + 1)}
@@ -919,7 +934,6 @@ export default function App() {
                           </button>
                         ) : (
                           <div className="space-y-6">
-                            <div className="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-xl shadow-xl">🏆 전설의 키보드 수호대 탄생!</div>
                             <button
                               onClick={() => setView('main')}
                               className="bg-white text-slate-900 px-12 py-6 rounded-[30px] font-black text-3xl hover:bg-slate-50 transition-all flex items-center gap-3 shadow-2xl mx-auto border-b-8 border-slate-200"
