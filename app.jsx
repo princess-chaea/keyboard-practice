@@ -290,20 +290,20 @@ export default function App() {
     setCurrentStage(idx);
     setCurrentDialogueIdx(0);
     const stage = STAGES[idx];
-    setGameState({
+    setGameState(prev => ({
       input: (stage.type === 'typing' || stage.type === 'shortcut') ? '' : stage.text,
       completed: false,
       message: '',
       targetIdx: 0,
       isCtrlPressed: false,
-      clipboard: '',
+      clipboard: prev.clipboard, // 이전 클립보드 유지
       showError: false,
       showKeyboardMap: false,
       lastKeyPressed: '',
       viewMode: 'dialogue',
       showSuccessEffect: false,
       usedKeys: []
-    });
+    }));
     setView('game');
   };
 
