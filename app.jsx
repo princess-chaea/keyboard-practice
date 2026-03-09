@@ -494,7 +494,10 @@ export default function App() {
       // 필수 키 리스트가 있는 경우 모든 키를 사용했는지 확인
       if (stage.requiredKeyList) {
           const allUsed = stage.requiredKeyList.every(k => gameState.usedKeys.includes(k));
-          if (!allUsed) return false;
+          if (!allUsed) {
+            setGameState(prev => ({ ...prev, showError: true, message: "모든 마스터 키(Shift, Enter, Backspace)를 한 번씩 사용해야 보스를 물리칠 수 있어요!" }));
+            return false;
+          }
       }
 
       if (stage.type === 'typing') {
@@ -856,14 +859,7 @@ export default function App() {
                     </div>
 
                     <div className="relative">
-                      {gameState.showError && (
-                        <div className="absolute -top-20 left-0 right-0 flex justify-center animate-in slide-in-from-top-4 duration-300">
-                          <div className="bg-red-600 text-white px-8 py-4 rounded-2xl font-black shadow-2xl flex items-center gap-3 border-4 border-white">
-                            <Zap className="animate-pulse" />
-                            {gameState.message || "정확한 키를 사용하세요!"}
-                          </div>
-                        </div>
-                      )}
+                      {/* 기존 토스트 에러 삭제 (모달로 대체됨) */}
 
                       <div className={`absolute -top-12 left-6 flex gap-2 transition-all ${gameState.isCtrlPressed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
                         <div className="bg-blue-600 text-white px-5 py-1.5 rounded-xl font-black text-sm shadow-lg border-2 border-white">Ctrl 기술 발동!</div>
@@ -961,7 +957,7 @@ export default function App() {
       {/* 키보드 지도 모달 */}
       {gameState.showKeyboardMap && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-          <div className="bg-white rounded-[40px] shadow-2xl max-w-lg w-full overflow-hidden border-4 border-blue-400 animate-in zoom-in-95 duration-300">
+          <div className="bg-white rounded-[40px] shadow-2xl max-w-5xl w-full overflow-hidden border-4 border-blue-400 animate-in zoom-in-95 duration-300">
             <div className="bg-blue-400 p-6 flex justify-between items-center text-white">
               <h3 className="text-2xl font-black flex items-center gap-2">
                 <Keyboard /> 키보드 마법 지도
@@ -982,6 +978,28 @@ export default function App() {
                   "각 버튼의 이름과 기능을 잘 기억해 둬!<br />지도를 잘 보면 적들을 쉽게 물리칠 수 있어."
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 시스템 알림 모달 (에러/안내) */}
+      {gameState.showError && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4 animate-in fade-in duration-300">
+          <div className="bg-white rounded-[40px] shadow-2xl max-w-md w-full overflow-hidden border-4 border-red-400 animate-in zoom-in-95 duration-300">
+            <div className="bg-red-500 p-6 flex justify-center items-center text-white">
+               <Zap size={48} className="animate-pulse" />
+            </div>
+            <div className="p-8 text-center space-y-6">
+               <h3 className="text-2xl font-black text-slate-800 break-keep leading-relaxed">
+                 {gameState.message || "정확한 키를 사용하세요!"}
+               </h3>
+               <button
+                 onClick={() => setGameState(prev => ({ ...prev, showError: false }))}
+                 className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95"
+               >
+                 확인
+               </button>
             </div>
           </div>
         </div>
