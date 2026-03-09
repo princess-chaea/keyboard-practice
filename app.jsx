@@ -210,22 +210,39 @@ const STAGES = [
   {
     id: 9,
     level: '마스터',
-    title: "복제 로봇 (Ctrl+C/V / 컨트롤 C/V)",
+    title: "비밀의 복제술 (Ctrl+C / 복사)",
     bg: BG_SCHOOL,
     dialogue: [
       { speaker: 'SHIN', text: "똑같은 글자를 여러 번 쓰기 힘들어요..." },
-      { speaker: 'ACTION', text: "그럴 땐 복제 마법 'Ctrl+C'와 'Ctrl+V'를 쓰는 거야!" },
-      { speaker: 'ACTION', text: "글자를 선택하고 복사해서 붙여넣어 봐!" }
+      { speaker: 'ACTION', text: "그럴 땐 복제 마법 'Ctrl+C'를 쓰는 거야!" },
+      { speaker: 'ACTION', text: "마우스로 글자를 드래그해서 선택한 다음, 'Ctrl' 키를 누른 채 'C'를 눌러봐!" }
     ],
-    instruction: "문장을 복사해서 입력창에 붙여넣어!",
+    instruction: "문장을 마우스로 드래그해서 선택하고 Ctrl+C를 눌러 복사해!",
     type: 'shortcut',
     text: '액션가면 최고!',
-    targetAction: 'paste',
-    hint: "Ctrl+A(전체선택) -> Ctrl+C(복사) -> Ctrl+V(붙여넣기)",
-    failMsg: "단축키를 순서대로 잘 사용해 봐!"
+    targetAction: 'copy',
+    hint: "마우스 왼쪽 버튼을 누른 채 글자 위를 슥~ 움직여서 선택(드래그)해봐!",
+    failMsg: "정확한 문장을 드래그해서 Ctrl+C를 눌러야 해!"
   },
   {
     id: 10,
+    level: '마스터',
+    title: "무한 생성술 (Ctrl+V / 붙여넣기)",
+    bg: BG_SCHOOL,
+    dialogue: [
+      { speaker: 'SHIN', text: "복사한 에너지를 어떻게 사용하죠?" },
+      { speaker: 'ACTION', text: "이제 'Ctrl+V' 마법으로 에너지를 방출해!" },
+      { speaker: 'ACTION', text: "아래 입력창을 클릭하고 'Ctrl' 키를 누른 채 'V'를 누르는 거다!" }
+    ],
+    instruction: "입력창을 클릭한 후 Ctrl+V를 눌러서 문장을 붙여넣어!",
+    type: 'shortcut',
+    text: '액션가면 최고!',
+    targetAction: 'paste',
+    hint: "입력창을 한 번 클릭하고 Ctrl+V를 눌러!",
+    failMsg: "Ctrl+V를 눌러서 아까 복사한 문장을 붙여넣어봐!"
+  },
+  {
+    id: 11,
     level: '보스',
     title: "두목님의 마지막 일격",
     bg: BG_SCHOOL,
@@ -234,13 +251,13 @@ const STAGES = [
       { speaker: 'SHIN', text: "액션가면님, 힘을 빌려주세요!" },
       { speaker: 'ACTION', text: "짱구야, 지금까지 배운 모든 키를 사용하는 거다! 최종 결전이다!" }
     ],
-    instruction: "모든 기술을 동원해 문장을 완성해!",
+    instruction: "모든 기술을 동원해 문장을 완성해! (세 가지 마스터 키 필수)",
     type: 'edit',
     text: '유치원은지저분해용',
     targetText: '유치원은\n정말 즐거워!!',
-    requiredKey: 'All',
-    hint: "Enter로 줄 바꾸기, Shift로 쌍자음, Delete/Backspace로 지우기!",
-    failMsg: "포기하지 마! 끝까지 완성하는 거야!"
+    requiredKeyList: ['Shift', 'Enter', 'Backspace'],
+    hint: "Enter로 줄 바꾸기, Shift로 쌍자음과 !! 입력, Backspace로 글자 지우기!",
+    failMsg: "포기하지 마! 필수 키 3개를 모두 사용해서 완성하는 거야!"
   }
 ];
 
@@ -262,7 +279,8 @@ export default function App() {
     showKeyboardMap: false,
     lastKeyPressed: '',
     viewMode: 'dialogue', // 'dialogue' or 'play'
-    showSuccessEffect: false 
+    showSuccessEffect: false,
+    usedKeys: [] 
   });
 
   const startLevel = (idx) => {
@@ -280,7 +298,8 @@ export default function App() {
       showKeyboardMap: false,
       lastKeyPressed: '',
       viewMode: 'dialogue',
-      showSuccessEffect: false
+      showSuccessEffect: false,
+      usedKeys: []
     });
     setView('game');
   };
@@ -328,8 +347,11 @@ export default function App() {
   useEffect(() => {
     if (view === 'game' && gameState.viewMode === 'play') {
       const handleGlobalClick = (e) => {
+        // 드래그/선택을 위해 특정 클래스는 포커스 강제 이동 제외
+        const isSelectable = e.target.closest('.selectable-text');
+        
         // 모달이나 네비게이션 클릭이 아닐 경우 항상 입력창에 포커스
-        if (inputRef.current && !gameState.showKeyboardMap) {
+        if (inputRef.current && !gameState.showKeyboardMap && !isSelectable) {
            setTimeout(() => inputRef.current.focus(), 10);
         }
       };
@@ -343,7 +365,17 @@ export default function App() {
       if (view !== 'game' || gameState.viewMode !== 'play' || gameState.showSuccessEffect) return;
       
       const stage = STAGES[currentStage];
-      setGameState(prev => ({ ...prev, lastKeyPressed: e.key }));
+      setGameState(prev => {
+        const newState = { ...prev, lastKeyPressed: e.key };
+        
+        // 필수 키 트래킹 (보스 스테이지 등)
+        if (stage.requiredKeyList && stage.requiredKeyList.includes(e.key)) {
+            if (!prev.usedKeys.includes(e.key)) {
+                newState.usedKeys = [...prev.usedKeys, e.key];
+            }
+        }
+        return newState;
+      });
 
       // Tab 키 방어 (포커스 나가는 것 방지 및 입력 처리)
       if (e.key === 'Tab') {
@@ -386,7 +418,7 @@ export default function App() {
           // 글자/숫자 키 입력을 막고 오직 백스페이스, 딜리트, 방향키(제약 없을때), 엔터만 허용
           // 하지만 Stage 6, 10은 직접 입력을 병행해야 하므로 예외 처리
           const isActionKey = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter', 'Tab', 'Shift', 'Alt'].includes(e.key);
-          const canTypeInThisStage = [6, 10].includes(stage.id);
+          const canTypeInThisStage = [6, 11].includes(stage.id);
           
           if (!isActionKey && e.key.length === 1 && !e.ctrlKey && !canTypeInThisStage) {
               e.preventDefault();
@@ -413,14 +445,23 @@ export default function App() {
         if (stage.type === 'shortcut') {
           const key = e.key.toLowerCase();
           if (key === 'c') {
-            e.preventDefault();
-            setGameState(prev => ({ ...prev, message: '📋 복사 성공!', clipboard: stage.text }));
-          } else if (key === 'v') {
-            e.preventDefault();
-            if (gameState.clipboard === stage.text) {
-              setGameState(prev => ({ ...prev, input: stage.text, completed: true }));
+            // targetAction 이 copy 면 무조건 미션 성공으로 간주 (또는 드래그 여부 체크 가능)
+            if (stage.targetAction === 'copy') {
+                e.preventDefault();
+                setGameState(prev => ({ ...prev, clipboard: stage.text }));
+                checkCompletion(stage.text, stage); // 텍스트와 상관없이 Ctrl+C 발동 시 체크 (또는 텍스트 검증)
             } else {
-              setGameState(prev => ({ ...prev, showError: true, message: stage.failMsg }));
+                setGameState(prev => ({ ...prev, message: '📋 복사 성공!', clipboard: stage.text }));
+            }
+          } else if (key === 'v') {
+            if (stage.targetAction === 'paste') {
+                e.preventDefault();
+                if (gameState.clipboard === stage.text) {
+                  // checkCompletion 사용
+                  checkCompletion(stage.text, stage);
+                } else {
+                  setGameState(prev => ({ ...prev, showError: true, message: stage.failMsg }));
+                }
             }
           }
         }
@@ -442,6 +483,12 @@ export default function App() {
     }
 
     if (isMatch) {
+      // 필수 키 리스트가 있는 경우 모든 키를 사용했는지 확인
+      if (stage.requiredKeyList) {
+          const allUsed = stage.requiredKeyList.every(k => gameState.usedKeys.includes(k));
+          if (!allUsed) return false;
+      }
+
       if (stage.type === 'typing') {
         if (gameState.targetIdx < stage.targets.length - 1) {
           setGameState(prev => ({ ...prev, input: '', targetIdx: prev.targetIdx + 1, message: '정답입니다! 🌟' }));
@@ -468,7 +515,8 @@ export default function App() {
     setGameState(prev => ({ ...prev, showError: false }));
 
     // 문장 보호 (Anti-Vandalism)
-    if (stage.type === 'edit') {
+    // 보스 스테이지(id: 11)는 자유로운 편집을 위해 제외
+    if (stage.type === 'edit' && stage.id !== 11) {
         let testVal = val.replace(/\r/g, "");
         if (testVal.length < stage.targetText.length - 2) {
              setGameState(prev => ({ ...prev, showError: true, message: "너무 많이 지웠어요! 다시 해볼까요?" }));
@@ -756,10 +804,27 @@ export default function App() {
                   </div>
 
                   <div className="text-center space-y-10">
-                    <div>
-                      <h3 className="text-3xl font-black text-slate-900 mb-2">{STAGES[currentStage].title}</h3>
-                      <p className="text-lg font-bold text-yellow-600">{STAGES[currentStage].instruction}</p>
-                    </div>
+                      <div>
+                        <h3 className="text-3xl font-black text-slate-900 mb-2">{STAGES[currentStage].title}</h3>
+                        <p className="text-lg font-bold text-yellow-600">{STAGES[currentStage].instruction}</p>
+                        
+                        {/* 보스 스테이지용 마스터 키 트래커 */}
+                        {STAGES[currentStage].requiredKeyList && (
+                            <div className="flex justify-center gap-3 mt-4">
+                                {STAGES[currentStage].requiredKeyList.map(k => {
+                                    const isUsed = gameState.usedKeys.includes(k);
+                                    return (
+                                        <div key={k} className={`px-4 py-2 rounded-2xl border-4 transition-all duration-300 flex items-center gap-2 ${
+                                            isUsed ? 'bg-green-100 border-green-500 text-green-700 scale-110 shadow-md' : 'bg-slate-50 border-slate-200 text-slate-400 opacity-50'
+                                        }`}>
+                                            {isUsed ? <CheckCircle2 size={16} /> : <Zap size={16} />}
+                                            <span className="font-black text-sm">{k}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                      </div>
 
                     <div className="min-h-[140px] flex flex-col justify-center items-center">
                       {STAGES[currentStage].type === 'typing' ? (
@@ -775,7 +840,7 @@ export default function App() {
                         </div>
                       ) : (
                         <div className="w-full">
-                          <div className="text-3xl font-black text-slate-700 bg-slate-50 p-8 rounded-[35px] border-4 border-dashed border-slate-200 whitespace-pre-wrap leading-relaxed shadow-inner">
+                          <div className="text-3xl font-black text-slate-700 bg-slate-50 p-8 rounded-[35px] border-4 border-dashed border-slate-200 whitespace-pre-wrap leading-relaxed shadow-inner selectable-text select-text">
                             {STAGES[currentStage].targetText || STAGES[currentStage].text}
                           </div>
                         </div>
