@@ -215,13 +215,13 @@ const STAGES = [
     dialogue: [
       { speaker: 'SHIN', text: "똑같은 글자를 여러 번 쓰기 힘들어요..." },
       { speaker: 'ACTION', text: "그럴 땐 복제 마법 'Ctrl+C'를 쓰는 거야!" },
-      { speaker: 'ACTION', text: "마우스로 글자를 드래그해서 선택한 다음, 'Ctrl' 키를 누른 채 'C'를 눌러봐!" }
+      { speaker: 'ACTION', text: "마우스로 글자를 드래그해서 파란색으로 선택한 다음, 'Ctrl' 키를 누른 채 'C'를 눌러봐!" }
     ],
     instruction: "문장을 마우스로 드래그해서 선택하고 Ctrl+C를 눌러 복사해!",
     type: 'shortcut',
     text: '액션가면 최고!',
     targetAction: 'copy',
-    hint: "마우스 왼쪽 버튼을 누른 채 글자 위를 슥~ 움직여서 선택(드래그)해봐!",
+    hint: "마우스 왼쪽 버튼을 누른 채 글자 위를 슥~ 드래그하고 Ctrl+C를 눌러!",
     failMsg: "정확한 문장을 드래그해서 Ctrl+C를 눌러야 해!"
   },
   {
@@ -230,11 +230,11 @@ const STAGES = [
     title: "무한 생성술 (Ctrl+V / 붙여넣기)",
     bg: BG_SCHOOL,
     dialogue: [
-      { speaker: 'SHIN', text: "복사한 에너지를 어떻게 사용하죠?" },
+      { speaker: 'SHIN', text: "복사한 에너지는 어떻게 사용하죠?" },
       { speaker: 'ACTION', text: "이제 'Ctrl+V' 마법으로 에너지를 방출해!" },
-      { speaker: 'ACTION', text: "아래 입력창을 클릭하고 'Ctrl' 키를 누른 채 'V'를 누르는 거다!" }
+      { speaker: 'ACTION', text: "아래 '미션 수행 중...' 칸을 클릭하고 'Ctrl' 키를 누른 채 'V'를 누르는 거다!" }
     ],
-    instruction: "입력창을 클릭한 후 Ctrl+V를 눌러서 문장을 붙여넣어!",
+    instruction: "아래 입력창을 클릭한 후 Ctrl+V를 눌러서 문장을 붙여넣어!",
     type: 'shortcut',
     text: '액션가면 최고!',
     targetAction: 'paste',
@@ -445,11 +445,11 @@ export default function App() {
         if (stage.type === 'shortcut') {
           const key = e.key.toLowerCase();
           if (key === 'c') {
-            // targetAction 이 copy 면 무조건 미션 성공으로 간주 (또는 드래그 여부 체크 가능)
+            // targetAction 이 copy 면 무조건 미션 성공으로 간주
             if (stage.targetAction === 'copy') {
-                e.preventDefault();
+                // e.preventDefault() 를 하지 않아야 실제 브라우저 복사가 일어남
                 setGameState(prev => ({ ...prev, clipboard: stage.text }));
-                checkCompletion(stage.text, stage); // 텍스트와 상관없이 Ctrl+C 발동 시 체크 (또는 텍스트 검증)
+                checkCompletion(stage.text, stage); 
             } else {
                 setGameState(prev => ({ ...prev, message: '📋 복사 성공!', clipboard: stage.text }));
             }
@@ -731,7 +731,7 @@ export default function App() {
             </div>
 
             {gameState.viewMode === 'dialogue' ? (
-              <div className="bg-white/90 backdrop-blur-md rounded-[50px] p-8 shadow-2xl border-4 border-yellow-400 flex flex-col items-center justify-center space-y-8 animate-in slide-in-from-bottom-12 duration-500">
+              <div className="bg-white/90 backdrop-blur-md rounded-[50px] p-12 shadow-2xl border-4 border-yellow-400 flex flex-col items-center justify-center space-y-12 animate-in slide-in-from-bottom-12 duration-500">
                 <div className="flex items-center gap-8">
                   <div className="relative">
                     <img 
@@ -745,13 +745,13 @@ export default function App() {
                       alt="Speaker" 
                       className="w-32 h-32 drop-shadow-xl animate-pulse"
                     />
-                    <div className="absolute -top-4 -left-4 bg-yellow-400 text-white px-4 py-1.5 rounded-full font-black text-base border-2 border-white shadow-md whitespace-nowrap min-w-max">
+                    <div className="absolute -top-8 -left-4 bg-yellow-400 text-white px-4 py-1.5 rounded-full font-black text-base border-2 border-white shadow-md whitespace-nowrap min-w-max">
                       {STAGES[currentStage].dialogue[currentDialogueIdx].speaker}
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-slate-50 p-8 rounded-3xl border-4 border-slate-100 w-full relative">
+                <div className="bg-slate-50 p-10 rounded-3xl border-4 border-slate-100 w-full relative">
                   <p className="text-2xl font-black text-slate-800 text-center leading-relaxed">
                     "{STAGES[currentStage].dialogue[currentDialogueIdx].text}"
                   </p>
@@ -861,7 +861,12 @@ export default function App() {
                         <div className="bg-blue-600 text-white px-5 py-1.5 rounded-xl font-black text-sm shadow-lg border-2 border-white">Ctrl 기술 발동!</div>
                       </div>
 
-                      {STAGES[currentStage].type === 'typing' ? (
+                      {STAGES[currentStage].targetAction === 'copy' ? (
+                        <div className="w-full py-12 px-6 bg-blue-50/50 rounded-[45px] border-4 border-dashed border-blue-200 flex flex-col items-center justify-center gap-4 animate-pulse">
+                            <Copy className="text-blue-400" size={48} />
+                            <p className="text-xl font-black text-blue-600">위 문장을 드래그해서 Ctrl+C를 눌러주세요!</p>
+                        </div>
+                      ) : STAGES[currentStage].type === 'typing' ? (
                         <input
                           ref={inputRef}
                           type="text"
