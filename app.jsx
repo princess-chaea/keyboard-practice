@@ -22,7 +22,7 @@ import {
 // --- 이미지 자산 ---
 const SHIN_IMG = "https://i.ibb.co/Q3yff3rD/image.png";
 const ACTION_MASK_IMG = "https://i.ibb.co/DHWzNQ5Q/image.png";
-const VILLAIN_IMG = 'https://i.ibb.co/Hn6S95z/villain.png';
+const VILLAIN_IMG = "https://i.ibb.co/kgLsW9KH/image.png"; // 원장 선생님(두목님)
 const DAD_IMG = "https://i.ibb.co/mCYbd379/image.png";
 const MOM_IMG = "https://i.ibb.co/mrhjXcdz/image.png";
 const FINAL_CELEBRATION_IMG = 'https://i.ibb.co/tTY85PVp/image.png';
