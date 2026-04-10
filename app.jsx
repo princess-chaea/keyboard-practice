@@ -112,15 +112,17 @@ const STAGES = [
     dialogue: [
       { speaker: 'SHIN', text: "친구들에게 인사를 하고 싶어요!" },
       { speaker: 'ACTION', text: "좋아 짱구야! 줄을 바꿔서 멋지게 인사해 보자!" },
-      { speaker: 'ACTION', text: "다음 줄로 넘어갈 땐 'Enter' 에너지를 발산하는 거다!" }
+      { speaker: 'ACTION', text: "먼저 '안녕 친구들아' 끝을 마우스로 클릭해서 커서를 깜빡이게 만들어봐!" },
+      { speaker: 'ACTION', text: "그다음 'Enter' 에너지를 발산하는 거다!" }
     ],
-    instruction: "Enter(엔터) 키를 눌러 줄을 바꾸고 완성해!",
+    instruction: "첫 번째 줄 마지막('친구들아')을 마우스로 클릭한 뒤, Enter 키를 눌러 줄을 바꿔봐!",
     type: 'edit',
     text: '안녕 친구들아나 짱구야',
     targetText: '안녕 친구들아\n나 짱구야',
     requiredKey: 'Enter',
-    hint: "줄을 바꾸고 싶은 위치에서 Enter를 쾅!",
-    failMsg: "Enter 키로 줄을 바꿔야 해!"
+    checkEnterPos: 7,
+    hint: "첫 번째 줄 끝을 정확히 클릭하고 엔터를 눌러!",
+    failMsg: "첫 번째 줄 마지막을 클릭한 뒤에 엔터를 눌러야 해요!"
   },
   {
     id: 4,
@@ -188,6 +190,7 @@ const STAGES = [
     text: '이름:나짱구',
     targetText: '이름:\t나짱구',
     requiredKey: 'Tab',
+    initialCursorPos: 3, 
     hint: "Space보다 훨씬 멀리 점프하는 Tab 키!",
     failMsg: "Tab 키를 사용해서 간격을 벌려야 해!"
   },
@@ -401,11 +404,32 @@ export default function App() {
         return;
       }
 
-      // 미션에 따른 이동 제약 (Home/End 미션에서 방향키 금지)
-      if ((stage.requiredKey === 'Home' || stage.id === 6) && (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
-        e.preventDefault();
-        setGameState(prev => ({ ...prev, showError: true, message: "방향키 대신 Home/End 키를 사용하세요!" }));
-        return;
+      // 미션에 따른 이동 제약 (방향키가 미션이 아닌 경우 차단)
+      const arrowKeys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+      if (arrowKeys.includes(e.key)) {
+          // 방향키가 주목적인 스테이지(5, 6, 11)를 제외하고 모두 차단
+          if (![5, 6, 11].includes(stage.id)) {
+              e.preventDefault();
+              setGameState(prev => ({ ...prev, showError: true, message: "방향키 대신 정해진 기술을 연습해 봐요!" }));
+              return;
+          }
+          // Home/End 미션(6)에서 방향키 금지 (강제 이동 방지)
+          if (stage.id === 6) {
+              e.preventDefault();
+              setGameState(prev => ({ ...prev, showError: true, message: "방향키 대신 Home/End 키를 사용하세요!" }));
+              return;
+          }
+      }
+
+      // 엔터 키 위치 체크 (Stage 3 등)
+      if (e.key === 'Enter') {
+          if (stage.checkEnterPos !== undefined) {
+              if (e.target.selectionStart !== stage.checkEnterPos) {
+                  e.preventDefault();
+                  setGameState(prev => ({ ...prev, showError: true, message: stage.failMsg }));
+                  return;
+              }
+          }
       }
 
       if (stage.type === 'esc_challenge' && e.key === 'Escape') {
@@ -543,7 +567,15 @@ export default function App() {
 
   const handleMouseDown = (e) => {
     const stage = STAGES[currentStage];
-    if (['Arrow', 'Home', 'Delete', 'Backspace'].includes(stage.requiredKey) || stage.id === 6) {
+    
+    // 마우스 클릭으로 커서를 옮기는 것을 제한해야 하는 스테이지들
+    // Stage 3(엔터)는 클릭을 해야 하므로 허용
+    // Stage 9(복사)는 드래그를 해야 하므로 허용
+    // Stage 10(붙여넣기)는 입력창 클릭이 필요하므로 허용
+    // Stage 5(방향키), 6(홈엔드), 11(보스)는 자유도 허용
+    const restrictClickStages = [1, 2, 4, 7];
+    
+    if (restrictClickStages.includes(stage.id)) {
       e.preventDefault();
     }
   };
