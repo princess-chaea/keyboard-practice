@@ -349,6 +349,20 @@ export default function App() {
     }
   }, [view, gameState.viewMode, currentStage]);
 
+  // 커서 위치 강제 고정 (Stage 2 등에서 무단 이동 방지)
+  useEffect(() => {
+    if (view === 'game' && gameState.viewMode === 'play' && inputRef.current) {
+        const stage = STAGES[currentStage];
+        // Stage 2 (Delete)는 커서가 절대 움직이면 안 됨 (initialCursorPos에 고정)
+        if (stage.id === 2 && stage.initialCursorPos !== undefined) {
+             const pos = stage.initialCursorPos;
+             if (inputRef.current.selectionStart !== pos) {
+                 inputRef.current.setSelectionRange(pos, pos);
+             }
+        }
+    }
+  }, [view, currentStage, gameState.viewMode, gameState.input]);
+
   // 강력한 포커스 유지 (Sticky Focus)
   useEffect(() => {
     if (view === 'game' && gameState.viewMode === 'play') {
@@ -421,14 +435,31 @@ export default function App() {
           }
       }
 
-      // 엔터 키 위치 체크 (Stage 3 등)
+      // 엔터 키 제한 (미션이 아닌 경우 차단)
       if (e.key === 'Enter') {
+          // 엔터가 필요한 스테이지(3: 엔터 미션, 11: 보스전)가 아니면 차단
+          if (![3, 11].includes(stage.id)) {
+              e.preventDefault();
+              setGameState(prev => ({ ...prev, showError: true, message: "지금은 엔터 키를 사용할 때가 아니에요!" }));
+              return;
+          }
+          // 위치 체크가 필요한 경우
           if (stage.checkEnterPos !== undefined) {
               if (e.target.selectionStart !== stage.checkEnterPos) {
                   e.preventDefault();
                   setGameState(prev => ({ ...prev, showError: true, message: stage.failMsg }));
                   return;
               }
+          }
+      }
+
+      // Home/End 키 제한 (미션이 아닌 경우 차단)
+      if (['Home', 'End'].includes(e.key)) {
+          // Home/End가 필요한 스테이지(6: 홈엔드 미션, 11: 보스전)가 아니면 차단
+          if (![6, 11].includes(stage.id)) {
+              e.preventDefault();
+              setGameState(prev => ({ ...prev, showError: true, message: "지금은 Home/End 키를 사용할 때가 아니에요!" }));
+              return;
           }
       }
 
@@ -455,11 +486,13 @@ export default function App() {
       }
 
       if (stage.requiredKey) {
+        // 백스페이스 미션(1)에서 딜리트 사용 차단
         if (stage.requiredKey === 'Backspace' && e.key === 'Delete') {
           e.preventDefault();
           setGameState(prev => ({ ...prev, showError: true, message: "Backspace를 사용해야 해요!" }));
           return;
         }
+        // 딜리트 미션(2)에서 백스페이스 사용 차단
         if (stage.requiredKey === 'Delete' && e.key === 'Backspace') {
           e.preventDefault();
           setGameState(prev => ({ ...prev, showError: true, message: "Delete를 사용해야 해요!" }));
